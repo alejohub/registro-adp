@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "ADP Registro horario",
+  "version": "1.0.1",
+  "description": "Rellena los días pendientes de registro de entradas/salidas en ADP con un clic.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["https://www.adpnet.esp.adp.com/*"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "ADP Registro horario",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon48.png" alt="">
+    <h1>ADP · Registro horario</h1>
+    <span id="ver"></span>
+  </header>
+
+  <fieldset>
+    <legend>Horario</legend>
+    <label><span>Lun–Jue</span> <input class="hm" id="wkIn" value="09:00"> a <input class="hm" id="wkOut" value="18:30"></label>
+    <label><span>Viernes</span> <input class="hm" id="frIn" value="08:00"> a <input class="hm" id="frOut" value="15:00"></label>
+    <label><span>Agosto</span> <input class="hm" id="agIn" value="08:00"> a <input class="hm" id="agOut" value="15:15"></label>
+    <small>En agosto se aplica el mismo horario todos los días, incluidos los viernes.</small>
+  </fieldset>
+
+  <button id="scan">Buscar días pendientes</button>
+  <div id="days"></div>
+  <button id="fill" class="primary" disabled>Rellenar días seleccionados</button>
+  <div id="log"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

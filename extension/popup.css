@@ -1,0 +1,23 @@
+body { width: 360px; font: 13px system-ui, sans-serif; margin: 10px; color: #1d2433; }
+header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+header img { width: 28px; height: 28px; }
+h1 { font-size: 15px; margin: 0; flex: 1; }
+#ver { font-size: 11px; color: #6b7280; }
+fieldset { margin: 0 0 8px; padding: 6px 8px; border: 1px solid #d5dbe5; border-radius: 6px; }
+fieldset label { display: block; margin: 3px 0; }
+fieldset label span { display: inline-block; width: 56px; }
+fieldset small { color: #6b7280; }
+input.hm { width: 44px; text-align: center; font: inherit; font-variant-numeric: tabular-nums; padding: 2px; border: 1px solid #c3cad6; border-radius: 4px; }
+input.hm.bad { border-color: #b00020; background: #fdecee; }
+button { width: 100%; padding: 7px; margin: 4px 0; cursor: pointer; border: 1px solid #c3cad6; border-radius: 6px; background: #f4f6fa; }
+button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+#days { max-height: 240px; overflow-y: auto; margin: 4px 0; }
+.day { display: grid; grid-template-columns: 18px 64px 1fr auto; align-items: center; gap: 4px; padding: 2px 4px; border-radius: 4px; }
+.day:nth-child(odd) { background: #f7f8fb; }
+.day.isvac .what { color: #0b7a75; font-weight: 600; }
+.day.off { opacity: .45; }
+.vacl { font-size: 12px; white-space: nowrap; cursor: pointer; }
+#log { font-size: 12px; margin: 6px 0 0; max-height: 160px; overflow-y: auto; }
+.ok { color: #0a7a2f; }
+.err { color: #b00020; }
