@@ -1,2 +1,7 @@
 # Capturas de red: contienen cookies, tokens de sesión y datos personales
 *.har
+
+# Paquetes y herramientas locales
+node_modules/
+dist/
+web-ext-artifacts/

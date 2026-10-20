@@ -1,0 +1,11 @@
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "registro-adp@alejohub.github.io",
+      "strict_min_version": "158.0",
+      "data_collection_permissions": {
+        "required": ["personallyIdentifyingInfo", "websiteActivity"]
+      }
+    }
+  }
+}
