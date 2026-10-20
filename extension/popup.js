@@ -7,10 +7,22 @@
 async function adpRun(action, ymd, marks) {
   const base = '/adpnet/m661a43//servlet/';
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  // Hasta 3 reintentos ante errores de red o HTTP 5xx.
   const fetchText = async path => {
-    const r = await fetch(base + path, { credentials: 'include', cache: 'no-store' });
-    if (!r.ok) throw new Error(`${path.split('?')[0]}: HTTP ${r.status}`);
-    return r.text();
+    const name = path.split('?')[0];
+    for (let attempt = 0; ; attempt++) {
+      let r, netErr;
+      try {
+        r = await fetch(base + path, { credentials: 'include', cache: 'no-store' });
+      } catch (e) {
+        netErr = e;
+      }
+      if (r && r.ok) return r.text();
+      if (r && r.status < 500) throw new Error(`${name}: HTTP ${r.status}`);
+      const msg = r ? `${name}: HTTP ${r.status}` : `${name}: error de red (${netErr.message})`;
+      if (attempt >= 3) throw new Error(`${msg} (tras 3 reintentos)`);
+      await sleep(1500 * (attempt + 1));
+    }
   };
   const cellsOf = html => {
     const re = /cpr_regdet\?(\d{8}),,N'><p class='CPR_DIALNK'>\d+<\/p><\/a><\/td>\s*<\/tr>\s*<tr>\s*<td valign='bottom'>\s*<p class='(calendario_\d+)'>\s*([^<]*?)\s*<\/p>/g;
@@ -68,7 +80,10 @@ async function adpRun(action, ymd, marks) {
 
     if (action === 'vac') {
       if (worked.length) return { skipped: 'tiene marcas de TRABAJO; no se marca como vacaciones' };
-      const cellBefore = JSON.stringify(cellsOf(await fetchText('cpr_regcal')).find(c => c.ymd === ymd) || null);
+      const cell = cellsOf(await fetchText('cpr_regcal')).find(c => c.ymd === ymd) || null;
+      // Evita duplicar la ausencia si un intento anterior sí llegó a guardarla.
+      if (cell && !/^-\d{1,2}:\d{2}$/.test(cell.text)) return { skipped: 'ya no está pendiente' };
+      const cellBefore = JSON.stringify(cell);
       const { fr, d, w } = await openForm(`cpr_regaus?1,${ymd},${dni},gxPopupLevel%3D0%3B`, 'vCPR_AUSID');
       try {
         if (d.getElementById('vTIPO') && d.getElementById('vTIPO').value !== '0') set(d, w, 'vTIPO', '0'); // Toda la jornada
@@ -223,16 +238,29 @@ $('fill').addEventListener('click', async () => {
   const chosen = [...$('days').querySelectorAll('.day')]
     .filter(row => row.querySelector('.on').checked)
     .map(row => ({ ymd: row.dataset.ymd, vac: row.querySelector('.vac').checked }));
+  // Reintenta el día hasta 3 veces. Es seguro: cada intento vuelve a leer las marcas
+  // existentes y solo añade lo que falte.
+  const withRetries = async (ymd, run) => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await run();
+      } catch (e) {
+        if (attempt >= 3) throw e;
+        log(`${fmt(ymd)}: ${e.message} — reintento ${attempt + 1}/3…`, 'err');
+        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+      }
+    }
+  };
   try {
     for (const { ymd, vac } of chosen) {
       let r;
       if (vac) {
         log(`${fmt(ymd)}: registrando vacaciones…`);
-        r = await inTab('vac', ymd, null);
+        r = await withRetries(ymd, () => inTab('vac', ymd, null));
       } else {
         const [a, b] = scheduleFor(ymd);
         log(`${fmt(ymd)}: registrando ${a}–${b}…`);
-        r = await inTab('work', ymd, [a, b].map(t => t.split(':')));
+        r = await withRetries(ymd, () => inTab('work', ymd, [a, b].map(t => t.split(':'))));
       }
       if (r.skipped) log(`${fmt(ymd)}: omitido (${r.skipped})`);
       else log(`${fmt(ymd)}: OK (${r.label})`, 'ok');
